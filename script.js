@@ -1,13 +1,16 @@
 let itemIndex = 1;
 
+// ฟังก์ชันเพิ่มรายการสินค้า
 function addOrderItem() {
     itemIndex++;
     const orderItemsContainer = document.getElementById('orderItemsContainer');
 
+    // สร้าง div ใหม่สำหรับรายการสินค้า
     const newOrderItemDiv = document.createElement('div');
     newOrderItemDiv.className = 'order-item mb-3';
     newOrderItemDiv.id = 'order_item_' + itemIndex;
 
+    // กำหนด HTML ภายใน div ใหม่
     newOrderItemDiv.innerHTML = `
         <div class="row">
             <div class="col-md-3 mb-3">
@@ -34,23 +37,26 @@ function addOrderItem() {
         </div>
     `;
 
+    // เพิ่ม div ใหม่ไปยัง container
     orderItemsContainer.appendChild(newOrderItemDiv);
 }
 
+// ฟังก์ชันลบรายการสินค้า
 function removeOrderItem(button) {
     const orderItemsContainer = document.getElementById('orderItemsContainer');
     orderItemsContainer.removeChild(button.closest('.order-item'));
 }
 
+// ฟังก์ชันบันทึกออเดอร์
 function saveOrder() {
     const customerName = document.getElementById('customer_name').value;
     const fileName = document.getElementById('file_name').value;
 
+    // ตรวจสอบการกรอกข้อมูล
     if (!customerName) {
         alert('กรุณากรอกชื่อลูกค้า');
         return;
     }
-
     if (!fileName) {
         alert('กรุณากรอกชื่อไฟล์');
         return;
@@ -61,17 +67,15 @@ function saveOrder() {
     const orderQuantities = document.getElementsByName("order_quantity[]");
     const orderUnits = document.getElementsByName("order_unit[]");
 
+    // สร้าง timestamp สำหรับชื่อไฟล์
     const currentDateTime = new Date();
-    const timeStamp = currentDateTime.getFullYear() + 
-        (currentDateTime.getMonth() + 1).toString().padStart(2, '0') + 
-        currentDateTime.getDate().toString().padStart(2, '0') + "_" +
-        currentDateTime.getHours().toString().padStart(2, '0') +
-        currentDateTime.getMinutes().toString().padStart(2, '0') +
-        currentDateTime.getSeconds().toString().padStart(2, '0');
+    const timeStamp = `${currentDateTime.getFullYear()}${(currentDateTime.getMonth() + 1).toString().padStart(2, '0')}${currentDateTime.getDate().toString().padStart(2, '0')}_${currentDateTime.getHours().toString().padStart(2, '0')}${currentDateTime.getMinutes().toString().padStart(2, '0')}${currentDateTime.getSeconds().toString().padStart(2, '0')}`;
 
-    const sanitizedCustomerName = customerName.replace(/[^a-zA-Z0-9]/g, '_'); // แปลงอักขระพิเศษให้เป็น _
-    const downloadFileName = fileName + "_" + sanitizedCustomerName + "_" + timeStamp + ".xlsx";
+    // แปลงอักขระพิเศษในชื่อให้เป็น _
+    const sanitizedCustomerName = customerName.replace(/[^a-zA-Z0-9]/g, '_');
+    const downloadFileName = `${fileName}_${sanitizedCustomerName}_${timeStamp}.xlsx`;
 
+    // สร้างข้อมูลสำหรับไฟล์ Excel
     const data = [
         ["ข้อมูลการสั่งซื้อ"],
         ["ชื่อร้านค้า:", customerName],
@@ -93,8 +97,6 @@ function saveOrder() {
     const ws = XLSX.utils.aoa_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Order Data");
-
-    console.log("ดาวน์โหลดไฟล์:", downloadFileName); // เพิ่มการ log ชื่อไฟล์เพื่อการตรวจสอบ
 
     // ดาวน์โหลดไฟล์ Excel
     XLSX.writeFile(wb, downloadFileName);
