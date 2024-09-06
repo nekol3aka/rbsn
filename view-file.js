@@ -49,4 +49,4 @@ function displayFileContent(data) {
     } else {
         fileContentDiv.innerHTML = '<p>ไม่มีข้อมูลในไฟล์</p>';
     }
-}
+    }
