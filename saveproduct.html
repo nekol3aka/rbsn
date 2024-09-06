@@ -18,29 +18,37 @@
         }
     </style>
     <script>
-        // Function to save product to local storage
-        function saveProduct() {
-            const customerName = document.getElementById('customerName').value;
-            const productName = document.getElementById('productName').value;
-            const quantity = document.getElementById('quantity').value;
-            const unit = document.getElementById('unit').value;
+        // Function to save a batch of products to local storage
+        function saveBatch() {
+            const products = [];
+            const formElements = document.querySelectorAll('.product-form');
+            
+            formElements.forEach(form => {
+                const customerName = form.querySelector('[name="customerName"]').value;
+                const productName = form.querySelector('[name="productName"]').value;
+                const quantity = form.querySelector('[name="quantity"]').value;
+                const unit = form.querySelector('[name="unit"]').value;
 
-            if (!customerName || !productName || !quantity || !unit) {
+                if (customerName && productName && quantity && unit) {
+                    products.push({ customerName, productName, quantity, unit });
+                }
+            });
+
+            if (products.length === 0) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วน');
                 return;
             }
 
-            const productList = JSON.parse(localStorage.getItem('products')) || [];
-            
-            if (productList.length >= 10) {
-                alert('ไม่สามารถบันทึกได้เกิน 10 รายการ');
+            if (products.length > 10) {
+                alert('ไม่สามารถบันทึกเกิน 10 รายการ');
                 return;
             }
 
-            productList.push({ customerName, productName, quantity, unit });
-            localStorage.setItem('products', JSON.stringify(productList));
+            const existingProducts = JSON.parse(localStorage.getItem('products')) || [];
+            existingProducts.push(...products);
+            localStorage.setItem('products', JSON.stringify(existingProducts));
 
-            document.getElementById('product-form').reset();
+            document.getElementById('batch-form').reset();
             displayProducts();
         }
 
@@ -76,29 +84,51 @@
         window.onload = function() {
             displayProducts();
         }
+
+        // Add new product form
+        function addProductForm() {
+            const formContainer = document.getElementById('form-container');
+            const formCount = formContainer.querySelectorAll('.product-form').length;
+            
+            if (formCount >= 10) {
+                alert('ไม่สามารถเพิ่มฟอร์มมากกว่า 10 ฟอร์ม');
+                return;
+            }
+
+            const formHTML = `
+                <div class="product-form mb-3">
+                    <div class="form-group">
+                        <label for="customerName">ชื่อร้านลูกค้า:</label>
+                        <input type="text" name="customerName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productName">รายการสินค้า:</label>
+                        <input type="text" name="productName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">จำนวน:</label>
+                        <input type="number" name="quantity" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit">หน่วย:</label>
+                        <input type="text" name="unit" class="form-control" required>
+                    </div>
+                </div>
+            `;
+
+            formContainer.insertAdjacentHTML('beforeend', formHTML);
+        }
     </script>
 </head>
 <body>
     <div class="container">
         <h1 class="text-center">เพิ่มรายการสินค้า</h1>
-        <form id="product-form" onsubmit="event.preventDefault(); saveProduct();" class="mb-4">
-            <div class="form-group">
-                <label for="customerName">ชื่อร้านลูกค้า:</label>
-                <input type="text" id="customerName" name="customerName" class="form-control" required>
+        <form id="batch-form" class="mb-4">
+            <div id="form-container">
+                <!-- Dynamic product forms will be added here -->
             </div>
-            <div class="form-group">
-                <label for="productName">รายการสินค้า:</label>
-                <input type="text" id="productName" name="productName" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="quantity">จำนวน:</label>
-                <input type="number" id="quantity" name="quantity" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="unit">หน่วย:</label>
-                <input type="text" id="unit" name="unit" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">เพิ่มรายการ</button>
+            <button type="button" class="btn btn-secondary mb-3" onclick="addProductForm()">เพิ่มฟอร์ม</button>
+            <button type="button" class="btn btn-primary" onclick="saveBatch()">บันทึก</button>
         </form>
 
         <div class="table-container">
