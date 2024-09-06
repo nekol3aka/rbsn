@@ -52,13 +52,32 @@
             const quantity = document.getElementById('quantity').value;
             const unit = document.getElementById('unit').value;
 
-            // เพิ่มข้อมูลลงใน array
-            data.push({ customerName, product, quantity, unit });
+            if(customerName && product && quantity && unit) {
+                // เพิ่มข้อมูลลงใน array
+                data.push({ customerName, product, quantity, unit });
 
-            // แสดงข้อมูลในตาราง
-            const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            newRow.innerHTML = `<td>${customerName}</td><td>${product}</td><td>${quantity}</td><td>${unit}</td>`;
+                // แสดงข้อมูลในตาราง
+                const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+                const newRow = table.insertRow(); // สร้างแถวใหม่
+
+                const cell1 = newRow.insertCell(0);
+                const cell2 = newRow.insertCell(1);
+                const cell3 = newRow.insertCell(2);
+                const cell4 = newRow.insertCell(3);
+
+                cell1.textContent = customerName;
+                cell2.textContent = product;
+                cell3.textContent = quantity;
+                cell4.textContent = unit;
+
+                // ล้างค่าในฟอร์ม
+                document.getElementById('customerName').value = '';
+                document.getElementById('product').value = '';
+                document.getElementById('quantity').value = '';
+                document.getElementById('unit').value = '';
+            } else {
+                alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+            }
         }
 
         function exportToExcel() {
