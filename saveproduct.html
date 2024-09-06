@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มรายการสินค้า</title>
+    <script>
+        // Function to save product to local storage
+        function saveProduct() {
+            const factory = document.getElementById('factory').value;
+            const product = document.getElementById('product').value;
+            const quantity = document.getElementById('quantity').value;
+            const customer = document.getElementById('customer').value;
+
+            if (!factory || !product || !quantity || !customer) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            const productList = JSON.parse(localStorage.getItem('products')) || [];
+            productList.push({ factory, product, quantity, customer });
+            localStorage.setItem('products', JSON.stringify(productList));
+
+            document.getElementById('product-form').reset();
+            displayProducts();
+        }
+
+        // Function to display products from local storage
+        function displayProducts() {
+            const productList = JSON.parse(localStorage.getItem('products')) || [];
+            const productTable = document.getElementById('product-table');
+            productTable.innerHTML = `
+                <tr>
+                    <th>โรงงาน</th>
+                    <th>รายการสินค้า</th>
+                    <th>จำนวน</th>
+                    <th>ชื่อร้านลูกค้า</th>
+                </tr>
+            `;
+
+            productList.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.factory}</td>
+                    <td>${product.product}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.customer}</td>
+                `;
+                productTable.appendChild(row);
+            });
+        }
+
+        // Initialize page
+        window.onload = function() {
+            displayProducts();
+        }
+    </script>
+</head>
+<body>
+    <h1>เพิ่มรายการสินค้า</h1>
+    <form id="product-form" onsubmit="event.preventDefault(); saveProduct();">
+        <label for="factory">โรงงาน:</label>
+        <input type="text" id="factory" name="factory" required><br><br>
+
+        <label for="product">รายการสินค้า:</label>
+        <input type="text" id="product" name="product" required><br><br>
+
+        <label for="quantity">จำนวน:</label>
+        <input type="number" id="quantity" name="quantity" required><br><br>
+
+        <label for="customer">ชื่อร้านลูกค้า:</label>
+        <input type="text" id="customer" name="customer" required><br><br>
+
+        <input type="submit" value="เพิ่มรายการ">
+    </form>
+
+    <h2>รายการสินค้า</h2>
+    <table id="product-table" border="1">
+        <!-- Table content will be populated by JavaScript -->
+    </table>
+</body>
+</html>
