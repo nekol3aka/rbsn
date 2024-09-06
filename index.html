@@ -3,132 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เพิ่มรายการสินค้าใน Excel</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        body {
-            padding: 20px;
-        }
-        .container {
-            max-width: 900px;
-        }
-        .product-form {
-            margin-bottom: 1rem;
-        }
-    </style>
+    <title>Customer Data Entry</title>
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center">เพิ่มรายการสินค้าใน Excel</h1>
+    <h2>แบบฟอร์มกรอกข้อมูลลูกค้า</h2>
+    <form id="dataForm">
+        <label for="customerName">รายชื่อลูกค้า:</label>
+        <input type="text" id="customerName" name="customerName" required><br><br>
 
-        <!-- ฟอร์มสำหรับกรอกข้อมูลสินค้า -->
-        <form id="main-form" onsubmit="event.preventDefault(); addProductToExcel();" class="mb-4">
-            <div class="form-group">
-                <label for="customerName">ชื่อร้านลูกค้า:</label>
-                <input type="text" id="customerName" name="customerName" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="productName">รายการสินค้า:</label>
-                <input type="text" id="productName" name="productName" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="quantity">จำนวน:</label>
-                <input type="number" id="quantity" name="quantity" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="unit">หน่วย:</label>
-                <input type="text" id="unit" name="unit" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-primary">เพิ่มสินค้า</button>
-        </form>
+        <label for="product">รายการสินค้า:</label>
+        <input type="text" id="product" name="product" required><br><br>
 
-        <!-- ปุ่มอัปโหลดไฟล์ Excel -->
-        <div class="mb-4">
-            <label for="uploadExcel">อัปโหลดไฟล์ Excel:</label>
-            <input type="file" id="uploadExcel" class="form-control" accept=".xlsx, .xls">
-        </div>
+        <label for="quantity">จำนวน:</label>
+        <input type="number" id="quantity" name="quantity" required><br><br>
 
-        <!-- ปุ่มสำหรับบันทึกไฟล์ Excel ใหม่ -->
-        <button type="button" class="btn btn-success mb-3" onclick="saveUpdatedExcel()">บันทึกไฟล์ Excel</button>
-    </div>
+        <label for="unit">หน่วย:</label>
+        <input type="text" id="unit" name="unit" required><br><br>
 
+        <button type="button" onclick="addData()">เพิ่มข้อมูล</button>
+        <button type="button" onclick="exportToExcel()">บันทึกเป็น Excel</button>
+    </form>
+
+    <br>
+
+    <h3>ข้อมูลที่กรอก</h3>
+    <table border="1" id="dataTable">
+        <thead>
+            <tr>
+                <th>รายชื่อลูกค้า</th>
+                <th>รายการสินค้า</th>
+                <th>จำนวน</th>
+                <th>หน่วย</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- ข้อมูลจะถูกเพิ่มที่นี่ -->
+        </tbody>
+    </table>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script>
-        let workbook; // เก็บไฟล์ Excel ที่เปิด
-        let worksheet; // เก็บข้อมูลแผ่นงาน
-        let uploadedFileName; // เก็บชื่อไฟล์ที่อัปโหลด
+        let data = [];
 
-        // ฟังก์ชันสำหรับเปิดไฟล์ Excel
-        document.getElementById('uploadExcel').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            uploadedFileName = file.name; // เก็บชื่อไฟล์เดิม
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                workbook = XLSX.read(data, { type: 'array' });
-                worksheet = workbook.Sheets[workbook.SheetNames[0]]; // ใช้แผ่นงานแรก
-                alert('เปิดไฟล์ Excel สำเร็จ!');
-            };
-
-            reader.readAsArrayBuffer(file);
-        });
-
-        // ฟังก์ชันสำหรับเพิ่มข้อมูลสินค้าใหม่ลงใน Excel
-        function addProductToExcel() {
+        function addData() {
+            // ดึงข้อมูลจากฟอร์ม
             const customerName = document.getElementById('customerName').value;
-            const productName = document.getElementById('productName').value;
+            const product = document.getElementById('product').value;
             const quantity = document.getElementById('quantity').value;
             const unit = document.getElementById('unit').value;
 
-            if (!worksheet) {
-                alert('กรุณาอัปโหลดไฟล์ Excel ก่อน');
-                return;
-            }
+            // เพิ่มข้อมูลลงใน array
+            data.push({ customerName, product, quantity, unit });
 
-            // หาแถวสุดท้ายที่มีข้อมูล
-            const range = XLSX.utils.decode_range(worksheet['!ref']);
-            const lastRow = range.e.r + 1;
-
-            // เพิ่มข้อมูลลงในแถวใหม่
-            worksheet[`A${lastRow}`] = { v: customerName };
-            worksheet[`B${lastRow}`] = { v: productName };
-            worksheet[`C${lastRow}`] = { v: quantity };
-            worksheet[`D${lastRow}`] = { v: unit };
-
-            // ปรับขอบเขตของแผ่นงาน
-            worksheet['!ref'] = XLSX.utils.encode_range(range.s, { c: range.e.c, r: lastRow });
-
-            alert('เพิ่มข้อมูลสำเร็จ!');
+            // แสดงข้อมูลในตาราง
+            const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.innerHTML = `<td>${customerName}</td><td>${product}</td><td>${quantity}</td><td>${unit}</td>`;
         }
 
-        // ฟังก์ชันสำหรับบันทึกไฟล์ Excel ที่อัปเดตแล้ว
-        function saveUpdatedExcel() {
-            if (!workbook || !worksheet) {
-                alert('กรุณาอัปโหลดไฟล์ Excel ก่อน');
-                return;
-            }
+        function exportToExcel() {
+            // สร้าง worksheet และ workbook
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Customers");
 
-            // แปลงแผ่นงานกลับเป็นไฟล์ Excel
-            const newWorkbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(newWorkbook, worksheet, 'Sheet1');
-            const newExcel = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' });
-
-            // สร้างไฟล์ใหม่และดาวน์โหลดด้วยชื่อไฟล์เดิม
-            const blob = new Blob([newExcel], { type: 'application/octet-stream' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = uploadedFileName; // ใช้ชื่อไฟล์เดิม
-            link.click();
-
-            alert('บันทึกไฟล์ Excel สำเร็จ!');
+            // บันทึกเป็นไฟล์ Excel
+            XLSX.writeFile(wb, "customer_data.xlsx");
         }
     </script>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
