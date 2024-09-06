@@ -119,16 +119,26 @@
 
         // Function to print the product table
         function printTable() {
+            const includeCustomerName = document.getElementById('include-customer-name').checked;
             const productTable = document.getElementById('product-table');
             let printContent = '<html><head><title>Print Table</title>';
             printContent += '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">';
             printContent += '<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd; padding: 8px; } th { background-color: #f2f2f2; }</style>';
-            printContent += '</head><body><h2>รายการสินค้า</h2><table class="table table-striped table-bordered"><thead><tr><th>ชื่อร้านลูกค้า</th><th>รายการสินค้า</th><th>จำนวน</th><th>หน่วย</th></tr></thead><tbody>';
+            printContent += '</head><body><h2>รายการสินค้า</h2><table class="table table-striped table-bordered"><thead><tr>';
 
+            // Add column headers based on the checkbox
+            if (includeCustomerName) {
+                printContent += '<th>ชื่อร้านลูกค้า</th>';
+            }
+            printContent += '<th>รายการสินค้า</th><th>จำนวน</th><th>หน่วย</th></tr></thead><tbody>';
+
+            // Add rows based on the checkbox
             const rows = productTable.querySelectorAll('tbody tr');
             rows.forEach(row => {
                 printContent += '<tr>';
-                printContent += '<td>' + row.children[1].innerText + '</td>';
+                if (includeCustomerName) {
+                    printContent += '<td>' + row.children[1].innerText + '</td>';
+                }
                 printContent += '<td>' + row.children[2].innerText + '</td>';
                 printContent += '<td>' + row.children[3].innerText + '</td>';
                 printContent += '<td>' + row.children[4].innerText + '</td>';
@@ -206,6 +216,9 @@
             <h2>รายการสินค้า</h2>
             <button type="button" class="btn btn-danger mb-3" onclick="deleteSelectedProducts()">ลบรายการที่เลือก</button>
             <button type="button" class="btn btn-info mb-3" onclick="toggleCustomerColumn()">ซ่อน/แสดงชื่อร้านลูกค้า</button>
+            <div class="form-group">
+                <label><input type="checkbox" id="include-customer-name" checked> แสดงชื่อร้านลูกค้าในการพิมพ์</label>
+            </div>
             <button type="button" class="btn btn-success mb-3" onclick="printTable()">ปริ้นข้อมูล</button>
             <table id="product-table" class="table table-striped table-bordered">
                 <!-- Table content will be populated by JavaScript -->
