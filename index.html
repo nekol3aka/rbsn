@@ -14,28 +14,28 @@
     
     <div class="row justify-content-center">
       <div class="col-md-6">
-        <form>
-          <div class="mb-3">
-            <label for="optionSelect" class="form-label">Choose an option</label>
-            <select class="form-select" id="optionSelect">
-              <option value="ARM">ARM</option>
-              <option value="HM">HM</option>
-              <option value="BOO">BOO</option>
-              <option value="OOH">OOH</option>
-              <option value="CS">CS</option>
-              <option value="LCK">LCK</option>
-              <option value="SYC">SYC</option>
-              <option value="UNF">UNF</option>
-            </select>
-          </div>
-          
-          <div class="d-grid gap-2">
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
-        </form>
+        <!-- Buttons for each option -->
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('ARM')">ARM</button>
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('HM')">HM</button>
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('BOO')">BOO</button>
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('OOH')">OOH</button>
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('CS')">CS</button>
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('LCK')">LCK</button>
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('SYC')">SYC</button>
+          <button class="btn btn-outline-primary" type="button" onclick="handleClick('UNF')">UNF</button>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- JavaScript for handling button clicks -->
+  <script>
+    function handleClick(option) {
+      alert('You selected: ' + option);
+      // You can replace the alert with actual logic, such as form submission or navigation
+    }
+  </script>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-mQ93vvZAT+VZ92wTxp2ZGTZjHV8CBFW1BV2RYp2yghnI/tD+OMmSk3xZ+jG5CkLw" crossorigin="anonymous"></script>
