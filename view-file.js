@@ -16,40 +16,37 @@ function openFile() {
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-        if (jsonData.length > 1) {
-            const header = jsonData[0]; // แถวแรกเป็นหัวตาราง
-            const rows = jsonData.slice(1); // ข้อมูลที่เหลือ
+        // แยกข้อมูลออกเป็นสองส่วน: ลูกค้าและสินค้า
+        const customerData = [];
+        const productData = [];
 
-            // เรียงลำดับข้อมูลตามคอลัมน์แรก
-            rows.sort((a, b) => {
-                const valueA = a[0] || ''; // ถ้า a[0] ว่างให้ใช้ค่า ''
-                const valueB = b[0] || ''; // ถ้า b[0] ว่างให้ใช้ค่า ''
+        // ตรวจสอบข้อมูลและแยกประเภทของข้อมูลตามหัวข้อในแต่ละแถว
+        jsonData.forEach((row) => {
+            if (row.includes('ชื่อลูกค้า')) {
+                customerData.push(row); // แถวหัวข้อของลูกค้า
+            } else if (row.includes('รหัสสินค้า')) {
+                productData.push(row); // แถวหัวข้อของสินค้า
+            } else if (customerData.length > 0 && productData.length === 0) {
+                customerData.push(row); // ข้อมูลลูกค้า
+            } else if (productData.length > 0) {
+                productData.push(row); // ข้อมูลสินค้า
+            }
+        });
 
-                if (!isNaN(valueA) && !isNaN(valueB)) {
-                    return valueA - valueB; // เรียงลำดับแบบตัวเลข
-                }
-
-                return valueA.toString().localeCompare(valueB.toString());
-            });
-
-            // แสดงผลตารางโดยมีหัวตารางอยู่ด้านบนเสมอ
-            displayFileContent([header, ...rows]);
-        } else {
-            displayFileContent(jsonData);
-        }
+        // แสดงผลข้อมูลลูกค้าและสินค้า
+        displayFileContent(customerData, "ข้อมูลลูกค้า");
+        displayFileContent(productData, "ข้อมูลสินค้า");
     };
     
     reader.readAsArrayBuffer(file);
 }
 
-function displayFileContent(data) {
+function displayFileContent(data, title) {
     const fileContentDiv = document.getElementById('fileContent');
-    fileContentDiv.innerHTML = ""; // ล้างเนื้อหาก่อนหน้า
-
+    fileContentDiv.innerHTML += `<h3>${title}</h3>`; // แสดงหัวข้อ
+    
     if (data.length > 0) {
         let table = '<table class="table table-bordered"><thead><tr>';
-        
-        const numberOfColumns = data[0].length; // นับจำนวนคอลัมน์จากหัวตาราง
 
         // สร้างหัวตาราง
         for (const header of data[0]) {
@@ -60,18 +57,15 @@ function displayFileContent(data) {
         // แสดงข้อมูลในแต่ละแถวตามลำดับที่อยู่ในไฟล์
         for (let i = 1; i < data.length; i++) {
             table += '<tr>';
-            const row = data[i];
-
-            // ตรวจสอบและเติมคอลัมน์ว่างหากแถวมีจำนวนน้อยกว่าหัวตาราง
-            for (let j = 0; j < numberOfColumns; j++) {
-                table += `<td>${row[j] || ''}</td>`; // แสดงเซลล์ที่ว่างเป็นค่าว่างแทน undefined
+            for (const cell of data[i]) {
+                table += `<td>${cell || ''}</td>`;  // แสดงเซลล์ที่ว่างเป็นค่าว่างแทน undefined
             }
             table += '</tr>';
         }
         table += '</tbody></table>';
 
-        fileContentDiv.innerHTML = table; // แสดงตารางข้อมูล
+        fileContentDiv.innerHTML += table; // แสดงตารางข้อมูล
     } else {
-        fileContentDiv.innerHTML = '<p>ไม่มีข้อมูลในไฟล์</p>';
+        fileContentDiv.innerHTML += '<p>ไม่มีข้อมูลในไฟล์</p>';
     }
 }
