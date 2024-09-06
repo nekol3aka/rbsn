@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Real-time Product Search</h2>
+
+    <!-- ช่องค้นหา -->
+    <input type="text" id="searchInput" onkeyup="searchProducts()" placeholder="Search for products...">
+
+    <!-- ตารางแสดงรายการสินค้า -->
+    <table id="productTable">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- รายการสินค้าจะถูกแสดงที่นี่ -->
+        </tbody>
+    </table>
+
+    <script>
+        // ข้อมูลสินค้า 10 รายการที่เรามีอยู่แล้ว
+        const products = [
+            { name: 'Product A', price: 100 },
+            { name: 'Product B', price: 200 },
+            { name: 'Product C', price: 150 },
+            { name: 'Product D', price: 250 },
+            { name: 'Product E', price: 300 },
+            { name: 'Product F', price: 180 },
+            { name: 'Product G', price: 120 },
+            { name: 'Product H', price: 220 },
+            { name: 'Product I', price: 275 },
+            { name: 'Product J', price: 190 }
+        ];
+
+        // ฟังก์ชันแสดงรายการสินค้าในตาราง
+        function displayProducts(products) {
+            const tableBody = document.querySelector("#productTable tbody");
+            tableBody.innerHTML = ''; // เคลียร์ข้อมูลเดิม
+            products.forEach(product => {
+                const row = `<tr>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // แสดงสินค้าทั้งหมดเมื่อโหลดหน้าเว็บครั้งแรก
+        displayProducts(products);
+
+        // ฟังก์ชันการค้นหา
+        function searchProducts() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(input)
+            );
+            displayProducts(filteredProducts); // แสดงรายการสินค้าที่ค้นพบ
+        }
+    </script>
+
+</body>
+</html>
