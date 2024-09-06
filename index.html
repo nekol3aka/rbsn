@@ -1,94 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Data Entry</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selection Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1JkRoD5n3e5I6Vw" crossorigin="anonymous">
 </head>
 <body>
-    <h2>แบบฟอร์มกรอกข้อมูลลูกค้า</h2>
-    <form id="dataForm">
-        <label for="customerName">รายชื่อลูกค้า:</label>
-        <input type="text" id="customerName" name="customerName" required><br><br>
 
-        <label for="product">รายการสินค้า:</label>
-        <input type="text" id="product" name="product" required><br><br>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Select an Option</h1>
+    
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <form>
+          <div class="mb-3">
+            <label for="optionSelect" class="form-label">Choose an option</label>
+            <select class="form-select" id="optionSelect">
+              <option value="ARM">ARM</option>
+              <option value="HM">HM</option>
+              <option value="BOO">BOO</option>
+              <option value="OOH">OOH</option>
+              <option value="CS">CS</option>
+              <option value="LCK">LCK</option>
+              <option value="SYC">SYC</option>
+              <option value="UNF">UNF</option>
+            </select>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
-        <label for="quantity">จำนวน:</label>
-        <input type="number" id="quantity" name="quantity" required><br><br>
-
-        <label for="unit">หน่วย:</label>
-        <input type="text" id="unit" name="unit" required><br><br>
-
-        <button type="button" onclick="addData()">เพิ่มข้อมูล</button>
-        <button type="button" onclick="exportToExcel()">บันทึกเป็น Excel</button>
-    </form>
-
-    <br>
-
-    <h3>ข้อมูลที่กรอก</h3>
-    <table border="1" id="dataTable">
-        <thead>
-            <tr>
-                <th>รายชื่อลูกค้า</th>
-                <th>รายการสินค้า</th>
-                <th>จำนวน</th>
-                <th>หน่วย</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- ข้อมูลจะถูกเพิ่มที่นี่ -->
-        </tbody>
-    </table>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script>
-        let data = [];
-
-        function addData() {
-            // ดึงข้อมูลจากฟอร์ม
-            const customerName = document.getElementById('customerName').value;
-            const product = document.getElementById('product').value;
-            const quantity = document.getElementById('quantity').value;
-            const unit = document.getElementById('unit').value;
-
-            if(customerName && product && quantity && unit) {
-                // เพิ่มข้อมูลลงใน array
-                data.push({ customerName, product, quantity, unit });
-
-                // แสดงข้อมูลในตาราง
-                const table = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-                const newRow = table.insertRow(); // สร้างแถวใหม่
-
-                const cell1 = newRow.insertCell(0);
-                const cell2 = newRow.insertCell(1);
-                const cell3 = newRow.insertCell(2);
-                const cell4 = newRow.insertCell(3);
-
-                cell1.textContent = customerName;
-                cell2.textContent = product;
-                cell3.textContent = quantity;
-                cell4.textContent = unit;
-
-                // ล้างค่าในฟอร์ม
-                document.getElementById('customerName').value = '';
-                document.getElementById('product').value = '';
-                document.getElementById('quantity').value = '';
-                document.getElementById('unit').value = '';
-            } else {
-                alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
-            }
-        }
-
-        function exportToExcel() {
-            // สร้าง worksheet และ workbook
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Customers");
-
-            // บันทึกเป็นไฟล์ Excel
-            XLSX.writeFile(wb, "customer_data.xlsx");
-        }
-    </script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-mQ93vvZAT+VZ92wTxp2ZGTZjHV8CBFW1BV2RYp2yghnI/tD+OMmSk3xZ+jG5CkLw" crossorigin="anonymous"></script>
 </body>
 </html>
