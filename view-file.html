@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เปิดไฟล์ Excel</title>
+    <title>ดูไฟล์ Excel</title>
     <!-- เรียกใช้ Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- เรียกใช้ Font Awesome -->
@@ -18,17 +18,20 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
+            max-width: 1000px;
             margin-top: 40px;
         }
         .file-preview {
+            margin-top: 20px;
+        }
+        .table-container {
             margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 class="text-center mb-4">เปิดไฟล์ Excel</h2>
+        <h2 class="text-center mb-4">ดูไฟล์ Excel</h2>
         <input type="file" id="fileInput" class="form-control mb-3" accept=".xlsx, .xls">
         <button type="button" class="btn btn-primary" onclick="openFile()">
             <i class="fas fa-upload"></i> อัพโหลดไฟล์
@@ -36,7 +39,7 @@
         <button type="button" class="btn btn-secondary mt-2" onclick="printContent()">
             <i class="fas fa-print"></i> พิมพ์
         </button>
-        <div id="fileContent" class="mt-4"></div>
+        <div id="fileContent" class="table-container"></div>
     </div>
 
     <!-- เรียกใช้ Bootstrap JavaScript -->
@@ -46,72 +49,73 @@
     <!-- ไลบรารี XLSX -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
     <!-- ไฟล์ JavaScript ส่วนตัว -->
-    <script src="view-file.js"></script>
     <script>
         function openFile() {
-            var fileInput = document.getElementById('fileInput');
-            var file = fileInput.files[0];
-            var reader = new FileReader();
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("กรุณาเลือกไฟล์");
+                return;
+            }
+
+            const reader = new FileReader();
             
             reader.onload = function(event) {
-                var data = new Uint8Array(event.target.result);
-                var workbook = XLSX.read(data, { type: 'array' });
-                var sheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[sheetName];
-                var range = XLSX.utils.decode_range(worksheet['!ref']);
-                var rows = [];
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, { type: "array" });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                for (var row = range.s.r; row <= range.e.r; row++) {
-                    var rowData = [];
-                    for (var col = range.s.c; col <= range.e.c; col++) {
-                        var cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
-                        var cell = worksheet[cellAddress];
-                        rowData.push(cell ? cell.v : '');
-                    }
-                    rows.push(rowData);
-                }
+                // สมมติว่าข้อมูลลูกค้าเริ่มต้นที่แถว 1 และข้อมูลสินค้าเริ่มต้นที่แถว 10
+                const customerStartRow = 0;
+                const productStartRow = 10;
 
-                // Sort rows by the first column (numeric or text)
-                rows.sort((a, b) => {
-                    if (typeof a[0] === 'string' && typeof b[0] === 'string') {
-                        return a[0].localeCompare(b[0]);
-                    }
-                    return a[0] - b[0];
-                });
+                // แยกข้อมูลลูกค้าและสินค้า
+                const customerData = jsonData.slice(customerStartRow, productStartRow);
+                const productData = jsonData.slice(productStartRow);
 
-                // Generate HTML table from sorted rows
-                var html = '<table class="table table-bordered"><thead><tr>';
-                
-                // Add table headers if available, otherwise leave blank
-                if (rows.length > 0) {
-                    for (var col = 0; col < rows[0].length; col++) {
-                        // Use the value from the first row as header
-                        html += '<th>' + (rows[0][col] || '') + '</th>';
-                    }
-                    html += '</tr></thead><tbody>';
-                    
-                    // Remove the first row used for headers from the data rows
-                    rows.shift();
-                    
-                    for (var i = 0; i < rows.length; i++) {
-                        html += '<tr>';
-                        for (var j = 0; j < rows[i].length; j++) {
-                            html += '<td>' + rows[i][j] + '</td>';
-                        }
-                        html += '</tr>';
-                    }
-                    html += '</tbody></table>';
-                }
-
-                document.getElementById('fileContent').innerHTML = html;
+                // แสดงผลข้อมูลลูกค้าและสินค้า
+                displayFileContent(customerData, "ข้อมูลลูกค้า");
+                displayFileContent(productData, "ข้อมูลสินค้า");
             };
-
+            
             reader.readAsArrayBuffer(file);
         }
 
+        function displayFileContent(data, title) {
+            const fileContentDiv = document.getElementById('fileContent');
+            let html = `<h3>${title}</h3>`;
+
+            if (data.length > 0) {
+                html += '<table class="table table-bordered"><thead><tr>';
+
+                // สร้างหัวตาราง
+                for (const header of data[0]) {
+                    html += `<th>${header}</th>`;
+                }
+                html += '</tr></thead><tbody>';
+                
+                // แสดงข้อมูลในแต่ละแถวตามลำดับที่อยู่ในไฟล์
+                for (let i = 1; i < data.length; i++) {
+                    html += '<tr>';
+                    for (const cell of data[i]) {
+                        html += `<td>${cell || ''}</td>`; // แสดงเซลล์ที่ว่างเป็นค่าว่างแทน undefined
+                    }
+                    html += '</tr>';
+                }
+                html += '</tbody></table>';
+            } else {
+                html += '<p>ไม่มีข้อมูลในไฟล์</p>';
+            }
+
+            fileContentDiv.innerHTML += html; // แสดงตารางข้อมูล
+        }
+
         function printContent() {
-            var printWindow = window.open('', '', 'height=600,width=800');
-            var content = `
+            const printWindow = window.open('', '', 'height=600,width=800');
+            const content = `
                 <html>
                 <head>
                     <title>Print</title>
@@ -124,7 +128,7 @@
                 </head>
                 <body>
                     <div class="container">
-                        <div>${document.getElementById('fileContent').innerHTML}</div>
+                        ${document.getElementById('fileContent').innerHTML}
                     </div>
                 </body>
                 </html>
