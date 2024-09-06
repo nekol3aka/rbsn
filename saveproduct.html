@@ -63,6 +63,7 @@
             productTable.innerHTML = `
                 <thead>
                     <tr>
+                        <th>Select</th>
                         <th>ชื่อร้านลูกค้า</th>
                         <th>รายการสินค้า</th>
                         <th>จำนวน</th>
@@ -72,9 +73,10 @@
                 <tbody>
             `;
 
-            productList.forEach(product => {
+            productList.forEach((product, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
+                    <td><input type="checkbox" class="product-select" data-index="${index}"></td>
                     <td>${product.customerName}</td>
                     <td>${product.productName}</td>
                     <td>${product.quantity}</td>
@@ -82,6 +84,23 @@
                 `;
                 productTable.querySelector('tbody').appendChild(row);
             });
+        }
+
+        // Function to delete selected products
+        function deleteSelectedProducts() {
+            const selectedCheckboxes = document.querySelectorAll('.product-select:checked');
+            const indicesToDelete = Array.from(selectedCheckboxes).map(cb => parseInt(cb.getAttribute('data-index')));
+
+            if (indicesToDelete.length === 0) {
+                alert('กรุณาเลือกสินค้าที่ต้องการลบ');
+                return;
+            }
+
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+            products = products.filter((_, index) => !indicesToDelete.includes(index));
+            localStorage.setItem('products', JSON.stringify(products));
+
+            displayProducts();
         }
 
         // Initialize page
@@ -144,6 +163,7 @@
 
         <div class="table-container">
             <h2>รายการสินค้า</h2>
+            <button type="button" class="btn btn-danger mb-3" onclick="deleteSelectedProducts()">ลบรายการที่เลือก</button>
             <table id="product-table" class="table table-striped table-bordered">
                 <!-- Table content will be populated by JavaScript -->
             </table>
