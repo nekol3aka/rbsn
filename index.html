@@ -51,16 +51,18 @@
         </div>
 
         <!-- ปุ่มสำหรับบันทึกไฟล์ Excel ใหม่ -->
-        <button type="button" class="btn btn-success mb-3" onclick="saveUpdatedExcel()">บันทึกไฟล์ Excel ใหม่</button>
+        <button type="button" class="btn btn-success mb-3" onclick="saveUpdatedExcel()">บันทึกไฟล์ Excel</button>
     </div>
 
     <script>
         let workbook; // เก็บไฟล์ Excel ที่เปิด
         let worksheet; // เก็บข้อมูลแผ่นงาน
+        let uploadedFileName; // เก็บชื่อไฟล์ที่อัปโหลด
 
         // ฟังก์ชันสำหรับเปิดไฟล์ Excel
         document.getElementById('uploadExcel').addEventListener('change', function(event) {
             const file = event.target.files[0];
+            uploadedFileName = file.name; // เก็บชื่อไฟล์เดิม
             const reader = new FileReader();
 
             reader.onload = function(e) {
@@ -113,11 +115,11 @@
             XLSX.utils.book_append_sheet(newWorkbook, worksheet, 'Sheet1');
             const newExcel = XLSX.write(newWorkbook, { bookType: 'xlsx', type: 'array' });
 
-            // สร้างไฟล์ใหม่และดาวน์โหลด
+            // สร้างไฟล์ใหม่และดาวน์โหลดด้วยชื่อไฟล์เดิม
             const blob = new Blob([newExcel], { type: 'application/octet-stream' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'updated_products.xlsx';
+            link.download = uploadedFileName; // ใช้ชื่อไฟล์เดิม
             link.click();
 
             alert('บันทึกไฟล์ Excel สำเร็จ!');
