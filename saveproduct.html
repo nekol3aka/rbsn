@@ -11,7 +11,7 @@
             padding: 20px;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
         }
         .table-container {
             margin-top: 20px;
@@ -20,18 +20,24 @@
     <script>
         // Function to save product to local storage
         function saveProduct() {
-            const factory = document.getElementById('factory').value;
-            const product = document.getElementById('product').value;
+            const customerName = document.getElementById('customerName').value;
+            const productName = document.getElementById('productName').value;
             const quantity = document.getElementById('quantity').value;
-            const customer = document.getElementById('customer').value;
+            const unit = document.getElementById('unit').value;
 
-            if (!factory || !product || !quantity || !customer) {
+            if (!customerName || !productName || !quantity || !unit) {
                 alert('กรุณากรอกข้อมูลให้ครบถ้วน');
                 return;
             }
 
             const productList = JSON.parse(localStorage.getItem('products')) || [];
-            productList.push({ factory, product, quantity, customer });
+            
+            if (productList.length >= 10) {
+                alert('ไม่สามารถบันทึกได้เกิน 10 รายการ');
+                return;
+            }
+
+            productList.push({ customerName, productName, quantity, unit });
             localStorage.setItem('products', JSON.stringify(productList));
 
             document.getElementById('product-form').reset();
@@ -45,10 +51,10 @@
             productTable.innerHTML = `
                 <thead>
                     <tr>
-                        <th>โรงงาน</th>
-                        <th>รายการสินค้า</th>
-                        <th>จำนวน (ชิ้น)</th>
                         <th>ชื่อร้านลูกค้า</th>
+                        <th>รายการสินค้า</th>
+                        <th>จำนวน</th>
+                        <th>หน่วย</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,10 +63,10 @@
             productList.forEach(product => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${product.factory}</td>
-                    <td>${product.product}</td>
-                    <td>${product.quantity} ชิ้น</td>
-                    <td>${product.customer}</td>
+                    <td>${product.customerName}</td>
+                    <td>${product.productName}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.unit}</td>
                 `;
                 productTable.querySelector('tbody').appendChild(row);
             });
@@ -77,20 +83,20 @@
         <h1 class="text-center">เพิ่มรายการสินค้า</h1>
         <form id="product-form" onsubmit="event.preventDefault(); saveProduct();" class="mb-4">
             <div class="form-group">
-                <label for="factory">โรงงาน:</label>
-                <input type="text" id="factory" name="factory" class="form-control" required>
+                <label for="customerName">ชื่อร้านลูกค้า:</label>
+                <input type="text" id="customerName" name="customerName" class="form-control" required>
             </div>
             <div class="form-group">
-                <label for="product">รายการสินค้า:</label>
-                <input type="text" id="product" name="product" class="form-control" required>
+                <label for="productName">รายการสินค้า:</label>
+                <input type="text" id="productName" name="productName" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="quantity">จำนวน:</label>
                 <input type="number" id="quantity" name="quantity" class="form-control" required>
             </div>
             <div class="form-group">
-                <label for="customer">ชื่อร้านลูกค้า:</label>
-                <input type="text" id="customer" name="customer" class="form-control" required>
+                <label for="unit">หน่วย:</label>
+                <input type="text" id="unit" name="unit" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-primary">เพิ่มรายการ</button>
         </form>
