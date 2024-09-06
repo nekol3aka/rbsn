@@ -21,17 +21,11 @@ function handleFileLoad(event) {
     const worksheet = workbook.Sheets[firstSheetName];
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-    // สมมติว่าข้อมูลลูกค้าเริ่มต้นที่แถว 1 และข้อมูลสินค้าเริ่มต้นที่แถว 10
-    const customerStartRow = 0;
-    const productStartRow = 10;
+    // สมมติว่าข้อมูลลูกค้าเริ่มต้นที่แถว 0 และมีการสิ้นสุดที่แถวที่ 9
+    const customerData = jsonData.slice(0, 10); // ดึงข้อมูลเฉพาะแถวที่ 0 ถึง 9
 
-    // แยกข้อมูลลูกค้าและสินค้า
-    const customerData = jsonData.slice(customerStartRow, productStartRow);
-    const productData = jsonData.slice(productStartRow);
-
-    // แสดงผลข้อมูลลูกค้าและสินค้า
+    // แสดงผลเฉพาะข้อมูลลูกค้า
     displayFileContent(customerData, "ข้อมูลลูกค้า");
-    displayFileContent(productData, "ข้อมูลสินค้า");
 }
 
 // ฟังก์ชันที่แสดงข้อมูลในตาราง
@@ -61,7 +55,7 @@ function displayFileContent(data, title) {
         html += '<p>ไม่มีข้อมูลในไฟล์</p>';
     }
 
-    fileContentDiv.innerHTML += html; // แสดงตารางข้อมูล
+    fileContentDiv.innerHTML = html; // แสดงตารางข้อมูล
 }
 
 // ฟังก์ชันที่พิมพ์เนื้อหาของตาราง
