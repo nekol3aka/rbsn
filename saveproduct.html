@@ -16,6 +16,9 @@
         .table-container {
             margin-top: 20px;
         }
+        .product-form {
+            margin-bottom: 1rem;
+        }
     </style>
     <script>
         // Function to save products to local storage
@@ -90,16 +93,16 @@
         function addProductForm() {
             const formContainer = document.getElementById('product-form-container');
             const formHTML = `
-                <div class="product-form mb-3">
-                    <div class="form-group">
+                <div class="product-form row">
+                    <div class="col-md-4 form-group">
                         <label for="productName">รายการสินค้า:</label>
                         <input type="text" name="productName" class="form-control" required>
                     </div>
-                    <div class="form-group">
+                    <div class="col-md-4 form-group">
                         <label for="quantity">จำนวน:</label>
                         <input type="number" name="quantity" class="form-control" required>
                     </div>
-                    <div class="form-group">
+                    <div class="col-md-4 form-group">
                         <label for="unit">หน่วย:</label>
                         <input type="text" name="unit" class="form-control" required>
                     </div>
@@ -119,17 +122,17 @@
                 <input type="text" id="customerName" name="customerName" class="form-control" required>
             </div>
             <div id="product-form-container">
-                <!-- Dynamic product forms will be added here -->
-                <div class="product-form mb-3">
-                    <div class="form-group">
+                <!-- Initial product form -->
+                <div class="product-form row">
+                    <div class="col-md-4 form-group">
                         <label for="productName">รายการสินค้า:</label>
                         <input type="text" name="productName" class="form-control" required>
                     </div>
-                    <div class="form-group">
+                    <div class="col-md-4 form-group">
                         <label for="quantity">จำนวน:</label>
                         <input type="number" name="quantity" class="form-control" required>
                     </div>
-                    <div class="form-group">
+                    <div class="col-md-4 form-group">
                         <label for="unit">หน่วย:</label>
                         <input type="text" name="unit" class="form-control" required>
                     </div>
