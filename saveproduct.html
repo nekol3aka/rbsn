@@ -140,6 +140,22 @@
             printWindow.print();
         }
 
+        // Function to save products as a .txt file
+        function saveToTxt() {
+            const productList = JSON.parse(localStorage.getItem('products')) || [];
+            let textContent = 'ชื่อร้านลูกค้า\tรายการสินค้า\tจำนวน\tหน่วย\n';
+
+            productList.forEach(product => {
+                textContent += `${product.customerName}\t${product.productName}\t${product.quantity}\t${product.unit}\n`;
+            });
+
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'products.txt';
+            link.click();
+        }
+
         // Initialize page
         window.onload = function() {
             displayProducts();
@@ -205,6 +221,7 @@
                 <label><input type="checkbox" id="include-customer-name" checked> แสดงชื่อร้านลูกค้าในการพิมพ์</label>
             </div>
             <button type="button" class="btn btn-success mb-3" onclick="printTable()">ปริ้นข้อมูล</button>
+            <button type="button" class="btn btn-info mb-3" onclick="saveToTxt()">บันทึกเป็นไฟล์ .txt</button>
             <table id="product-table" class="table table-striped table-bordered">
                 <!-- Table content will be populated by JavaScript -->
             </table>
