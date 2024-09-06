@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ดูไฟล์ Excel</title>
+    <!-- เรียกใช้ Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- เรียกใช้ Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- สไตล์ส่วนตัว -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin-top: 40px;
+        }
+        .table-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center mb-4">ดูไฟล์ Excel</h2>
+        <input type="file" id="fileInput" class="form-control mb-3" accept=".xlsx, .xls">
+        <button type="button" class="btn btn-primary" onclick="openFile()">
+            <i class="fas fa-upload"></i> อัพโหลดไฟล์
+        </button>
+        <button type="button" class="btn btn-secondary mt-2" onclick="printContent()">
+            <i class="fas fa-print"></i> พิมพ์
+        </button>
+        <div id="fileContent" class="table-container"></div>
+    </div>
+
+    <!-- เรียกใช้ Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- เรียกใช้ Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    <!-- ไลบรารี XLSX -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+    <!-- ไฟล์ JavaScript ส่วนตัว -->
+    <script src="view-file.js"></script>
+</body>
+</html>

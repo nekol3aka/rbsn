@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มรายการสินค้า</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .table-container {
+            margin-top: 20px;
+        }
+        .product-form {
+            margin-bottom: 1rem;
+        }
+    </style>
+    <script>
+        // Function to save products to local storage
+        function saveProducts() {
+            const customerName = document.getElementById('customerName').value;
+            const productForms = document.querySelectorAll('.product-form');
+            const products = [];
+
+            if (!customerName) {
+                alert('กรุณากรอกชื่อร้านลูกค้า');
+                return;
+            }
+
+            productForms.forEach(form => {
+                const productName = form.querySelector('[name="productName"]').value;
+                const quantity = form.querySelector('[name="quantity"]').value;
+                const unit = form.querySelector('[name="unit"]').value;
+
+                if (productName && quantity && unit) {
+                    products.push({ customerName, productName, quantity, unit });
+                }
+            });
+
+            if (products.length === 0) {
+                alert('กรุณากรอกข้อมูลสินค้า');
+                return;
+            }
+
+            const existingProducts = JSON.parse(localStorage.getItem('products')) || [];
+            existingProducts.push(...products);
+            localStorage.setItem('products', JSON.stringify(existingProducts));
+
+            document.getElementById('main-form').reset();
+            document.querySelectorAll('.product-form').forEach(form => form.remove());
+            displayProducts();
+        }
+
+        // Function to display products from local storage
+        function displayProducts() {
+            const productList = JSON.parse(localStorage.getItem('products')) || [];
+            const productTable = document.getElementById('product-table');
+            productTable.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>ชื่อร้านลูกค้า</th>
+                        <th>รายการสินค้า</th>
+                        <th>จำนวน</th>
+                        <th>หน่วย</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            productList.forEach((product, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="product-select" data-index="${index}"></td>
+                    <td>${product.customerName}</td>
+                    <td>${product.productName}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.unit}</td>
+                `;
+                productTable.querySelector('tbody').appendChild(row);
+            });
+        }
+
+        // Function to delete selected products
+        function deleteSelectedProducts() {
+            const selectedCheckboxes = document.querySelectorAll('.product-select:checked');
+            const indicesToDelete = Array.from(selectedCheckboxes).map(cb => parseInt(cb.getAttribute('data-index')));
+
+            if (indicesToDelete.length === 0) {
+                alert('กรุณาเลือกสินค้าที่ต้องการลบ');
+                return;
+            }
+
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+            products = products.filter((_, index) => !indicesToDelete.includes(index));
+            localStorage.setItem('products', JSON.stringify(products));
+
+            displayProducts();
+        }
+
+        // Function to print the product table
+        function printTable() {
+            const includeCustomerName = document.getElementById('include-customer-name').checked;
+            const productTable = document.getElementById('product-table');
+            let printContent = '<html><head><title>Print Table</title>';
+            printContent += '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">';
+            printContent += '<style>table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ddd; padding: 8px; } th { background-color: #f2f2f2; }</style>';
+            printContent += '</head><body><h2>รายการสินค้า</h2><table class="table table-striped table-bordered"><thead><tr>';
+
+            // Add column headers based on the checkbox
+            if (includeCustomerName) {
+                printContent += '<th>ชื่อร้านลูกค้า</th>';
+            }
+            printContent += '<th>รายการสินค้า</th><th>จำนวน</th><th>หน่วย</th></tr></thead><tbody>';
+
+            // Add rows based on the checkbox
+            const rows = productTable.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                printContent += '<tr>';
+                if (includeCustomerName) {
+                    printContent += '<td>' + row.children[1].innerText + '</td>';
+                }
+                printContent += '<td>' + row.children[2].innerText + '</td>';
+                printContent += '<td>' + row.children[3].innerText + '</td>';
+                printContent += '<td>' + row.children[4].innerText + '</td>';
+                printContent += '</tr>';
+            });
+
+            printContent += '</tbody></table></body></html>';
+
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.open();
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Function to save products as a .txt file
+        function saveToTxt() {
+            const productList = JSON.parse(localStorage.getItem('products')) || [];
+            let textContent = 'ชื่อร้านลูกค้า\tรายการสินค้า\tจำนวน\tหน่วย\n';
+
+            productList.forEach(product => {
+                textContent += `${product.customerName}\t${product.productName}\t${product.quantity}\t${product.unit}\n`;
+            });
+
+            const blob = new Blob([textContent], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'products.txt';
+            link.click();
+        }
+
+        // Initialize page
+        window.onload = function() {
+            displayProducts();
+        }
+
+        // Add new product form
+        function addProductForm() {
+            const formContainer = document.getElementById('product-form-container');
+            const formHTML = `
+                <div class="product-form row">
+                    <div class="col-md-4 form-group">
+                        <label for="productName">รายการสินค้า:</label>
+                        <input type="text" name="productName" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="quantity">จำนวน:</label>
+                        <input type="number" name="quantity" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="unit">หน่วย:</label>
+                        <input type="text" name="unit" class="form-control" required>
+                    </div>
+                </div>
+            `;
+
+            formContainer.insertAdjacentHTML('beforeend', formHTML);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">เพิ่มรายการสินค้า</h1>
+        <form id="main-form" onsubmit="event.preventDefault(); saveProducts();" class="mb-4">
+            <div class="form-group">
+                <label for="customerName">ชื่อร้านลูกค้า:</label>
+                <input type="text" id="customerName" name="customerName" class="form-control" required>
+            </div>
+            <div id="product-form-container">
+                <!-- Initial product form -->
+                <div class="product-form row">
+                    <div class="col-md-4 form-group">
+                        <label for="productName">รายการสินค้า:</label>
+                        <input type="text" name="productName" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="quantity">จำนวน:</label>
+                        <input type="number" name="quantity" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label for="unit">หน่วย:</label>
+                        <input type="text" name="unit" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-secondary mb-3" onclick="addProductForm()">เพิ่มฟอร์มสินค้า</button>
+            <button type="submit" class="btn btn-primary">บันทึก</button>
+        </form>
+
+        <div class="table-container">
+            <h2>รายการสินค้า</h2>
+            <button type="button" class="btn btn-danger mb-3" onclick="deleteSelectedProducts()">ลบรายการที่เลือก</button>
+            <div class="form-group">
+                <label><input type="checkbox" id="include-customer-name" checked> แสดงชื่อร้านลูกค้าในการพิมพ์</label>
+            </div>
+            <button type="button" class="btn btn-success mb-3" onclick="printTable()">ปริ้นข้อมูล</button>
+            <button type="button" class="btn btn-info mb-3" onclick="saveToTxt()">บันทึกเป็นไฟล์ .txt</button>
+            <table id="product-table" class="table table-striped table-bordered">
+                <!-- Table content will be populated by JavaScript -->
+            </table>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
