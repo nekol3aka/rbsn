@@ -15,8 +15,28 @@ function openFile() {
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        
-        displayFileContent(jsonData);
+
+        if (jsonData.length > 1) {
+            const header = jsonData[0]; // แถวแรกเป็นหัวตาราง
+            const rows = jsonData.slice(1); // ข้อมูลที่เหลือ
+
+            // เรียงลำดับข้อมูลตามคอลัมน์แรก
+            rows.sort((a, b) => {
+                const valueA = a[0] || ''; // ถ้า a[0] ว่างให้ใช้ค่า ''
+                const valueB = b[0] || ''; // ถ้า b[0] ว่างให้ใช้ค่า ''
+
+                if (!isNaN(valueA) && !isNaN(valueB)) {
+                    return valueA - valueB; // เรียงลำดับแบบตัวเลข
+                }
+
+                return valueA.toString().localeCompare(valueB.toString());
+            });
+
+            // แสดงผลตารางโดยมีหัวตารางอยู่ด้านบนเสมอ
+            displayFileContent([header, ...rows]);
+        } else {
+            displayFileContent(jsonData);
+        }
     };
     
     reader.readAsArrayBuffer(file);
@@ -28,6 +48,8 @@ function displayFileContent(data) {
 
     if (data.length > 0) {
         let table = '<table class="table table-bordered"><thead><tr>';
+        
+        const numberOfColumns = data[0].length; // นับจำนวนคอลัมน์จากหัวตาราง
 
         // สร้างหัวตาราง
         for (const header of data[0]) {
@@ -38,8 +60,11 @@ function displayFileContent(data) {
         // แสดงข้อมูลในแต่ละแถวตามลำดับที่อยู่ในไฟล์
         for (let i = 1; i < data.length; i++) {
             table += '<tr>';
-            for (const cell of data[i]) {
-                table += `<td>${cell || ''}</td>`;  // แสดงเซลล์ที่ว่างเป็นค่าว่างแทน undefined
+            const row = data[i];
+
+            // ตรวจสอบและเติมคอลัมน์ว่างหากแถวมีจำนวนน้อยกว่าหัวตาราง
+            for (let j = 0; j < numberOfColumns; j++) {
+                table += `<td>${row[j] || ''}</td>`; // แสดงเซลล์ที่ว่างเป็นค่าว่างแทน undefined
             }
             table += '</tr>';
         }
