@@ -47,7 +47,7 @@
                     <tr>
                         <th>โรงงาน</th>
                         <th>รายการสินค้า</th>
-                        <th>จำนวน</th>
+                        <th>จำนวน (ชิ้น)</th>
                         <th>ชื่อร้านลูกค้า</th>
                     </tr>
                 </thead>
@@ -59,7 +59,7 @@
                 row.innerHTML = `
                     <td>${product.factory}</td>
                     <td>${product.product}</td>
-                    <td>${product.quantity}</td>
+                    <td>${product.quantity} ชิ้น</td>
                     <td>${product.customer}</td>
                 `;
                 productTable.querySelector('tbody').appendChild(row);
