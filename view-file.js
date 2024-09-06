@@ -16,22 +16,13 @@ function openFile() {
         const worksheet = workbook.Sheets[firstSheetName];
         const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-        // แยกข้อมูลออกเป็นสองส่วน: ลูกค้าและสินค้า
-        const customerData = [];
-        const productData = [];
+        // ค้นหาตำแหน่งของตารางลูกค้าและสินค้าด้วยการระบุแถวที่เริ่มต้น
+        const customerStartRow = 0; // กำหนดแถวที่เริ่มต้นของข้อมูลลูกค้า
+        const productStartRow = 10; // กำหนดแถวที่เริ่มต้นของข้อมูลสินค้า
 
-        // ตรวจสอบข้อมูลและแยกประเภทของข้อมูลตามหัวข้อในแต่ละแถว
-        jsonData.forEach((row) => {
-            if (row.includes('ชื่อลูกค้า')) {
-                customerData.push(row); // แถวหัวข้อของลูกค้า
-            } else if (row.includes('รหัสสินค้า')) {
-                productData.push(row); // แถวหัวข้อของสินค้า
-            } else if (customerData.length > 0 && productData.length === 0) {
-                customerData.push(row); // ข้อมูลลูกค้า
-            } else if (productData.length > 0) {
-                productData.push(row); // ข้อมูลสินค้า
-            }
-        });
+        // แยกข้อมูลลูกค้าและสินค้า
+        const customerData = jsonData.slice(customerStartRow, productStartRow);
+        const productData = jsonData.slice(productStartRow);
 
         // แสดงผลข้อมูลลูกค้าและสินค้า
         displayFileContent(customerData, "ข้อมูลลูกค้า");
@@ -58,7 +49,7 @@ function displayFileContent(data, title) {
         for (let i = 1; i < data.length; i++) {
             table += '<tr>';
             for (const cell of data[i]) {
-                table += `<td>${cell || ''}</td>`;  // แสดงเซลล์ที่ว่างเป็นค่าว่างแทน undefined
+                table += `<td>${cell || ''}</td>`; // แสดงเซลล์ที่ว่างเป็นค่าว่างแทน undefined
             }
             table += '</tr>';
         }
